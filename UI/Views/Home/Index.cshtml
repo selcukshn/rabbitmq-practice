@@ -1,0 +1,105 @@
+﻿@model ConnectionModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+@if (TempData["alert"] != null)
+{
+    var alert = JsonConvert.DeserializeObject<AlertModel>(TempData["alert"] as String);
+    <div class="alert alert-@alert.Type">@alert.Message</div>
+}
+<div class="row">
+    <div class="col-8">
+        <div class="row mb-5">
+            <div class="col-12 mb-3">
+                Connection : <span class="badge rounded-pill bg-@(Model.Status ? "success":"danger")">@(Model.Status
+                    ?
+                    "Open":"Close")</span>
+            </div>
+            <div class="col-10">
+                <form asp-controller="home" asp-action="connect" method="post">
+                    <div class="input-group">
+                        <input disabled="@Model.Status" class="form-control" type="text" name="connectionUri"
+                            value="amqp://guest:guest@localhost:5672">
+                        <button disabled="@Model.Status" class="btn btn-success" type="submit">Connect</button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-2">
+                <form asp-controller="home" asp-action="disconnect" method="post">
+                    <button disabled="@(!Model.Status)" class="btn btn-danger" type="submit">Disconnect</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-6 p-3">
+                <h5>Create Queue</h5>
+                <form asp-controller="home" asp-action="createqueue" method="post">
+                    <div class="input-group">
+                        <input disabled="@(!Model.Status)" class="form-control" type="text" name="queue"
+                            placeholder="Queue name">
+                        <button disabled="@(!Model.Status)" class="btn btn-success" type="submit">Create</button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-6 p-3">
+                <h5>Create Exchange</h5>
+                <form asp-controller="home" asp-action="createexchange" method="post">
+                    <input disabled="@(!Model.Status)" class="form-control mb-2" type="text" name="exchange"
+                        placeholder="Exchange name">
+                    <select disabled="@(!Model.Status)" class="form-select mb-2" name="type">
+                        <option selected disabled value="">Select type</option>
+                        <option value="@((int)ETypes.Direct)">Direct</option>
+                        <option value="@((int)ETypes.Fanout)">Fanout</option>
+                        <option value="@((int)ETypes.Topic)">Topic</option>
+                    </select>
+                    <button disabled="@(!Model.Status)" class="btn btn-success w-100" type="submit">Create</button>
+                </form>
+            </div>
+            <div class="col-6 offset-3 p-3">
+                <h5>Bind Queue & Exchange</h5>
+                <form asp-controller="home" asp-action="createbind" method="post">
+                    <div class="input-group">
+                        <input disabled="@(!Model.Status)" class="form-control mb-2" type="text" name="exchange"
+                            placeholder="Queue name">
+                        <input disabled="@(!Model.Status)" class="form-control mb-2" type="text" name="queue"
+                            placeholder="Exchange name">
+                    </div>
+                    <input disabled="@(!Model.Status)" class="form-control mb-2" type="text" name="key"
+                        placeholder="Routing key">
+                    <button disabled="@(!Model.Status)" class="btn btn-success w-100" type="submit">Bind</button>
+                </form>
+            </div>
+            <div class="col-12 p-3">
+                <h5>Publish</h5>
+                <form asp-controller="home" asp-action="publish" method="post">
+                    <div class="input-group mb-2">
+                        <input disabled="@(!Model.Status)" class="form-control" type="text" name="exchange"
+                            placeholder="Exchange name">
+                        <select disabled="@(!Model.Status)" class="form-select" name="type">
+                            <option selected disabled value="">Select type</option>
+                            <option value="direct">Direct</option>
+                            <option value="fanout">Fanout</option>
+                            <option value="topic">Tooic</option>
+                        </select>
+                    </div>
+                    <input disabled="@(!Model.Status)" class="form-control mb-2" type="text" name="key"
+                        placeholder="Routing key">
+                    <textarea disabled="@(!Model.Status)" class="form-control mb-2" rows="3"
+                        placeholder="Message"></textarea>
+                    <button disabled="@(!Model.Status)" type="submit" class="btn btn-success w-100">Publish</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-4 bg-dark text-success font-monospace p-2">
+        <h5>Log</h5>
+        <ul class="list-unstyle">
+            @foreach (var log in Model.Logs)
+            {
+                <li>@log</li>
+            }
+        </ul>
+    </div>
+</div>
