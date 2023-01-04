@@ -34,7 +34,7 @@
         <div class="row">
             <div class="col-6 p-3">
                 <h5>Create Queue</h5>
-                <form asp-controller="home" asp-action="createqueue" method="post">
+                <form asp-controller="home" asp-action="declarequeue" method="post">
                     <div class="input-group">
                         <input disabled="@(!Model.Status)" class="form-control" type="text" name="queue"
                             placeholder="Queue name">
@@ -44,7 +44,7 @@
             </div>
             <div class="col-6 p-3">
                 <h5>Create Exchange</h5>
-                <form asp-controller="home" asp-action="createexchange" method="post">
+                <form asp-controller="home" asp-action="declareexchange" method="post">
                     <input disabled="@(!Model.Status)" class="form-control mb-2" type="text" name="exchange"
                         placeholder="Exchange name">
                     <select disabled="@(!Model.Status)" class="form-select mb-2" name="type">
@@ -58,15 +58,20 @@
             </div>
             <div class="col-6 offset-3 p-3">
                 <h5>Bind Queue & Exchange</h5>
-                <form asp-controller="home" asp-action="createbind" method="post">
+                <form asp-controller="home" asp-action="declarebind" method="post">
                     <div class="input-group">
-                        <input disabled="@(!Model.Status)" class="form-control mb-2" type="text" name="exchange"
-                            placeholder="Queue name">
                         <input disabled="@(!Model.Status)" class="form-control mb-2" type="text" name="queue"
+                            placeholder="Queue name">
+                        <input disabled="@(!Model.Status)" class="form-control mb-2" type="text" name="exchange"
                             placeholder="Exchange name">
                     </div>
-                    <input disabled="@(!Model.Status)" class="form-control mb-2" type="text" name="key"
+                    <input id="bindkey" disabled="@(!Model.Status)" class="form-control mb-2" type="text" name="key"
                         placeholder="Routing key">
+                    <label class="form-label" for="isdirect">
+                        <input disabled="@(!Model.Status)" type="checkbox" class="form-check-input" name="isdirect"
+                            id="isdirect" onclick="DisableBindKey()">
+                        Direct exchange
+                    </label>
                     <button disabled="@(!Model.Status)" class="btn btn-success w-100" type="submit">Bind</button>
                 </form>
             </div>
@@ -78,15 +83,17 @@
                             placeholder="Exchange name">
                         <select disabled="@(!Model.Status)" class="form-select" name="type">
                             <option selected disabled value="">Select type</option>
-                            <option value="direct">Direct</option>
-                            <option value="fanout">Fanout</option>
-                            <option value="topic">Tooic</option>
+                            <option value="@((int)EExchangeType.Direct)">Direct</option>
+                            <option value="@((int)EExchangeType.Fanout)">Fanout</option>
+                            <option value="@((int)EExchangeType.Topic)">Topic</option>
                         </select>
                     </div>
                     <input disabled="@(!Model.Status)" class="form-control mb-2" type="text" name="key"
                         placeholder="Routing key">
-                    <textarea disabled="@(!Model.Status)" class="form-control mb-2" rows="3"
-                        placeholder="Message"></textarea>
+                    <textarea disabled="@(!Model.Status)" class="form-control mb-2" rows="3" placeholder="Message"
+                        name="body"></textarea>
+                    <input disabled="@(!Model.Status)" class="form-control mb-2 w-25" type="number" name="repeat"
+                        placeholder="Repeat" min="0">
                     <button disabled="@(!Model.Status)" type="submit" class="btn btn-success w-100">Publish</button>
                 </form>
             </div>
@@ -103,3 +110,18 @@
         </ul>
     </div>
 </div>
+
+@section Script{
+<script>
+    function DisableBindKey() {
+        const isDirect = document.querySelector("#isdirect");
+        const bindKey = document.querySelector("#bindkey");
+        if (isDirect.checked) {
+            bindKey.disabled = true;
+            bindKey.value = "";
+        } else {
+            bindKey.disabled = false;
+        }
+    }
+</script>
+}

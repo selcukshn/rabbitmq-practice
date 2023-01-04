@@ -5,13 +5,15 @@ namespace MQ.Classes
 {
     public static class RabbitMQClient
     {
+        public static string Uri { get; } = "amqp://guest:guest@localhost:5672";
+
         public static IConnection Connection(string uri)
         {
-            ConnectionFactory factory = new ConnectionFactory()
+            return new ConnectionFactory()
             {
                 Uri = new Uri(uri, UriKind.RelativeOrAbsolute)
-            };
-            return factory.CreateConnection();
+            }
+            .CreateConnection();
         }
         public static IModel CreateChannel(IConnection connection)
         {
