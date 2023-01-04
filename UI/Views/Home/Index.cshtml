@@ -49,9 +49,9 @@
                         placeholder="Exchange name">
                     <select disabled="@(!Model.Status)" class="form-select mb-2" name="type">
                         <option selected disabled value="">Select type</option>
-                        <option value="@((int)ETypes.Direct)">Direct</option>
-                        <option value="@((int)ETypes.Fanout)">Fanout</option>
-                        <option value="@((int)ETypes.Topic)">Topic</option>
+                        <option value="@((int)EExchangeType.Direct)">Direct</option>
+                        <option value="@((int)EExchangeType.Fanout)">Fanout</option>
+                        <option value="@((int)EExchangeType.Topic)">Topic</option>
                     </select>
                     <button disabled="@(!Model.Status)" class="btn btn-success w-100" type="submit">Create</button>
                 </form>

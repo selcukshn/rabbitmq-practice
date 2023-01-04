@@ -1,10 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using RabbitMQ.Client;
 
-namespace MQ
+namespace MQ.Classes
 {
     public static class RabbitMQClient
     {

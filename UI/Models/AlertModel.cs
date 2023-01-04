@@ -1,15 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using UI.Enums;
 
 namespace UI.Models
 {
     public class AlertModel
     {
-        public string Type { get; set; }
+        public EAlertType Type { get; set; }
         public string Message { get; set; }
-        public AlertModel(string type, string message)
+        public AlertModel(EAlertType type, string message)
         {
             Type = type;
             Message = message;

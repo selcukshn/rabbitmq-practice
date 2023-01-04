@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using MQ;
-using Newtonsoft.Json;
+using MQ.Classes;
 using RabbitMQ.Client;
+using UI.Enums;
+using UI.Extensions;
 using UI.Models;
 
 namespace UI.Controllers
@@ -37,9 +38,16 @@ namespace UI.Controllers
         {
             if (!ConnectionOpen)
             {
-                Connection = RabbitMQClient.Connection(connectionUri);
-                ConnectionOpen = Connection.IsOpen;
-                Logs.Add("Connection is opened");
+                try
+                {
+                    Connection = RabbitMQClient.Connection(connectionUri);
+                    ConnectionOpen = Connection.IsOpen;
+                    Logs.Add("Connection is opened");
+                }
+                catch (Exception e)
+                {
+                    Logs.Add(e.Message);
+                }
             }
             return RedirectToAction("Index");
         }
@@ -64,29 +72,23 @@ namespace UI.Controllers
         {
             if (string.IsNullOrEmpty(exchange) || string.IsNullOrWhiteSpace(exchange))
             {
-                CreateAlert("danger", "Invalid exchange name");
-                return RedirectToAction("Index");
+                return this.RedirectToActionAlert("Index", EAlertType.danger, "Invalid exchange name");
             }
             int type;
             if (!int.TryParse(HttpContext.Request.Form["type"], out type))
             {
-                CreateAlert("danger", "Invalid exchange type");
-                return RedirectToAction("Index");
+                return this.RedirectToActionAlert("Index", EAlertType.danger, "Invalid exchange type");
             }
-            if (!ExchangeTypes.TypeValid(type))
+            if (!ExchangeTypeOperation.TypeValid(type))
             {
-                CreateAlert("danger", "Invalid exchange type");
-                return RedirectToAction("Index");
+                return this.RedirectToActionAlert("Index", EAlertType.danger, "Invalid exchange type");
             }
-            Channel.ExchangeDeclare(exchange, ExchangeTypes.GetType(type));
-            Logs.Add($"Exchange is created [{ExchangeTypes.GetType(type)}::{exchange}]");
+
+            Channel.ExchangeDeclare(exchange, ExchangeTypeOperation.GetType(type));
+            Logs.Add($"Exchange is created [{ExchangeTypeOperation.GetType(type)}::{exchange}]");
             return RedirectToAction("Index");
         }
 
-        public void CreateAlert(string type, string message)
-        {
-            TempData["alert"] = JsonConvert.SerializeObject(new AlertModel(type, message));
-        }
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
