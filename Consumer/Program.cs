@@ -9,11 +9,6 @@ namespace Consumer
 {
     class Program
     {
-        private static IConnection Connection;
-        private static IModel _channel;
-        private static IModel Channel => _channel ?? (_channel = RabbitMQClient.CreateChannel(Connection));
-        private static bool ConnectionOpen;
-        private static List<string> Logs = new List<string>();
         static void Main(string[] args)
         {
         start:
@@ -21,17 +16,19 @@ namespace Consumer
             string queueName = Console.ReadLine();
             try
             {
-                Connection = RabbitMQClient.Connection(RabbitMQClient.Uri);
+                var connection = RabbitMQClient.Connection(RabbitMQClient.Uri);
+                var channel = RabbitMQClient.CreateChannel(connection);
+
                 Log("Connection is opened");
 
-                var consumerEvent = new EventingBasicConsumer(Channel);
+                var consumerEvent = new EventingBasicConsumer(channel);
                 consumerEvent.Received += (ch, e) =>
                 {
                     var byteArr = e.Body.ToArray();
                     var bodyStr = Encoding.UTF8.GetString(byteArr);
                     Log($"Received data: {bodyStr}");
                 };
-                Channel.BasicConsume(queueName, true, consumerEvent);
+                channel.BasicConsume(queueName, true, consumerEvent);
                 Log($"{queueName} listening...");
                 Console.ReadLine();
             }
